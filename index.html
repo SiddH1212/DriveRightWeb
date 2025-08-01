@@ -29,14 +29,40 @@
         background: black;
         display: block;
       }
+      #loading-box {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 300px;
+        height: 20px;
+        background: #222;
+        border: 2px solid #555;
+        border-radius: 10px;
+        overflow: hidden;
+        z-index: 10;
+      }
+      #loading-bar {
+        width: 0%;
+        height: 100%;
+        background: #4af;
+        transition: width 0.2s ease-in-out;
+      }
     </style>
   </head>
   <body>
     <div id="unity-container">
+      <div id="loading-box">
+        <div id="loading-bar"></div>
+      </div>
       <canvas id="unity-canvas"></canvas>
     </div>
+
     <script src="Build/DesktopDriving.loader.js"></script>
     <script>
+      const loadingBox = document.getElementById("loading-box");
+      const loadingBar = document.getElementById("loading-bar");
+
       createUnityInstance(document.querySelector("#unity-canvas"), {
         dataUrl: "Build/DesktopDriving.data.unityweb",
         frameworkUrl: "Build/DesktopDriving.framework.js.unityweb",
@@ -45,10 +71,12 @@
         companyName: "YourCompany",
         productName: "DesktopDriving",
         productVersion: "1.0",
-        matchWebGLToCanvasSize: true, // ✅ This fixes the cropping issue
-        // devicePixelRatio: 1         // Optional: uncomment to override DPI scaling
+        matchWebGLToCanvasSize: true,
+        onProgress: (unityInstance, progress) => {
+          loadingBar.style.width = (progress * 100) + "%";
+        },
       }).then((unityInstance) => {
-        // Optional: Add fullscreen or UI hooks here
+        loadingBox.style.display = "none";
       }).catch((message) => {
         alert(message);
       });
